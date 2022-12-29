@@ -1,11 +1,10 @@
 import random
-
+import numpy as np
+import csv
 
 def exponentiation_rapide(a: int, e: int, p: int) -> int:
     """Calcul a^e mod p avec l'exponentiation rapide
     """
-
-
     a_pow: int = a
     resultat: int
     j = 0
@@ -23,16 +22,12 @@ def exponentiation_rapide(a: int, e: int, p: int) -> int:
             #print("resultat =", resultat)
     return resultat
 
-
 def rabbin_miller(p: int, a: int) -> bool:
     """Effectue le test de Rabbin Miller sur un nombre n
-
     vérification si p est pair ou égal à 1
     Calcul de s et d tel que p = (2^s)*d+1
-
     On calcul a^d mod p. On vérifie si a^d = 1 mod p
     On calcul les a^(2^r) mod p successifs. Pour chacun d'entre eux, on vérifie que a^(2^r)*a^d = -1
-
     Retourne True si le test fonctionne
     Retourne False si le test échoue
     """
@@ -67,7 +62,18 @@ def rabbin_miller(p: int, a: int) -> bool:
         a_pow = (a_pow * a_pow) % p
     return False
 
+def rabbin_miller_boucle(nb_premier:int) -> bool:
+    est_premier: bool = True
+    i=0
+    while (i != 10) & (est_premier):  # Fais un test de Rabbin Miller sur 10 itérations
+        i += 1
+        a: int = random.randint(0, nb_premier)
+        while (a % nb_premier) == 0:
+            a: int = random.randint(0, nb_premier)
 
+        est_premier = rabbin_miller(nb_premier, a)
+        # print("test Rabin Miller pour p =", nb_premier, "et a =", a, "est", est_premier)
+    return est_premier
 
 def gen_nbr_premier(max: int) -> int:
     """génère un nombre premier plus petit que max"""
@@ -76,67 +82,56 @@ def gen_nbr_premier(max: int) -> int:
     i: int
     while (est_premier == False):
         i = 0
-        nb_premier = random.randint(3,max)
-        print("-------------------------")
-        est_premier = True
-        while (i != 10) & (est_premier): #Fais un test de Rabbin Miller sur 10 itérations
-            i += 1
-            a: int = random.randint(0, max)
-            while ( a % nb_premier ) == 0 :
-                a: int = random.randint(0, max)
-
-            est_premier = rabbin_miller(nb_premier, a)
-            print("test Rabin Miller pour p =", nb_premier, "et a =", a, "est", est_premier)
-
+        nb_premier = random.randint(3, max)
+        # print("-------------------------")
+        est_premier = rabbin_miller_boucle(nb_premier)
     return nb_premier
 
-def gen_pg() -> (int, int):
-    """génère un nombre premier p et un nombre générateur g de l'ensemble Zp"""
-    p: int
-    g: int
-
-    return p, g
 
 
-# Retourne une clée publique et clé privée
-def init_cle(g: int, p: int) -> (int, int):
-    cle_publique: int
-    cle_privee: int
+def gen_nbr_premier_produit_V2(bit_max:int):
+    '''Génère un nombre premier p tel que p-1 soit le produit de n nombres premier
 
-    return cle_publique, cle_privee
+    bit_max : le nombre de bit sur lequel est écris le nombre premier.
+    On soustrait 1 car on multiplie le nombre p-1 par 2 (pour s'assurer qu'il est pair)
 
+    '''
 
-# Calcul de g générateur de Zp
-def generateur(p:int) -> int:
-    """Création d'un élément générateur g d'un ensemble Zp
+    bit_max = bit_max - 1
+    max = pow(2,bit_max)
 
-    TODO
-    """
-    g: int
+    est_premier = False
+    while not est_premier:
+        p = 2
+        p_facteur = gen_nbr_premier(max)
+        p = p * p_facteur + 1
+        print("------------")
+        print(p)
+        est_premier = rabbin_miller_boucle(p)
+    print("---Nombre premier final---")
+    print(p)
+    print(p_facteur)
+    return p, p_facteur
+
+def generateur_facteur_V2(p:int, p_facteur:int):
+    '''Calul l'élément générateur à partir du théorème de Lagrange'''
+    est_generateur = False
+    while not est_generateur:
+        est_generateur = True
+        g: int = random.randint(1, p - 1)
+        print("--------------------")
+        print(g)
+        print("--Facteurs--")
+        resultat1 = exponentiation_rapide(g, 2, p)
+        resultat2 = exponentiation_rapide(g, p_facteur, p)
+        resultat3 = exponentiation_rapide(g, p-1, p)
+        print("avec 2 :", resultat1, "avec l'autre:", resultat2, "et ça fait :", resultat3)
+        if (resultat1 == 1) | (resultat2 == 1):
+            est_generateur = False
+            print("c'est pas bon")
+
+    print("element generateur")
+    print(g)
     return g
 
-def gen_cle_commune_alice() -> (int, int, int):
-    """Calcul de p, g et a de Alice avec le protocole de Diffie Hellman"""
-    max: int = pow(2, 2048)
-    p: int = gen_nbr_premier(max) # génération d'un nombre premier de 2048 bits
-    g: int = generateur(p) # Calcul de l'élément générateur de Zp
-    a: int = exponentiation_rapide(g, random.randint(1, p-1), p) # Calcul de A = g^a mop p
-    return p, g, a
 
-def gen_cle_commune_bob(p: int, g:int, a:int) -> (int, int):
-    """Calcul de B à partir de p, g et A"""
-    b: int = exponentiation_rapide(g, random.randint(1, p-1), p)
-    k_bob: int = a * b
-    return b, k_bob
-
-def main():
-    p, g, a = gen_cle_commune_alice()
-    b, k_bob = gen_cle_commune_bob(p, g, a)
-    k_alice = b*a
-
-
-# Calcul de g^a mod p
-
-# print(exponentiation_rapide(5, 7, 15))
-gen_nbr_premier(pow(2,2048))
-# print(rabbin_miller(23,10))
