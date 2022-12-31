@@ -1,5 +1,5 @@
 import random
-from Fonctions import exponentiation_rapide
+from .. Fonctions import exponentiation_rapide
 
 
 class Cle:
@@ -12,12 +12,6 @@ class Cle:
 
         # TODO : Signature de la pré-clé
         # self.signature(self)
-
-    def __int__(self, id_pub, id_priv, sig_pk_pub, sig_sig_pk_pub):
-        self._id_pub = id_pub
-        self._id_priv = id_priv
-        self.sig_pk_pub = sig_pk_pub
-        self.sig_sig_pk_pub = sig_sig_pk_pub
 
     @property
     def id_pub(self) -> int:

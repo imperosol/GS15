@@ -12,9 +12,19 @@ def main():
 
     id_pub_a, pk_pub_a, optk_pub_a, optk_i = alice.publication_cle()
 
-    id_pub_b, id_eph, optk_i = bob.calcul_sk_bob(id_pub_a, pk_pub_a, optk_pub_a, optk_i, p, g)
-    alice.calcul_sk_alice(id_pub_b, id_eph, optk_i, p)
+    id_pub_b, id_eph, optk_i = bob.calcul_sk_emetteur_x3dh(id_pub_a, pk_pub_a, optk_pub_a, optk_i, p, g)
+    alice.calcul_sk_destinataire_x3dh(id_pub_b, id_eph, optk_i, p)
 
 
 if __name__ == '__main__':
     main()
+
+
+
+'''
+Créer un menu utilisateur permettant de respectivement
+
+- Envoyer un fichier
+- Envoyer un message
+
+'''
