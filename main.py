@@ -16,7 +16,7 @@ def main():
         if choix == '1':
             emetteur = alice
             recepteur = bob
-        if choix == '2':
+        elif choix == '2':
             emetteur = bob
             recepteur = alice
         print(choix)
@@ -33,7 +33,9 @@ def main():
         print("1 : comparer la valeur des clés")
         print("2 : incrémenter les clés Rachet")
         print("3 : nouvelles clés via dh")
-        choix = input("commande :")
+        print("4 : envoyer un message")
+        choix = input("commande : ")
+
 
         if choix == '1':
             print("-emetteur-")
@@ -43,9 +45,22 @@ def main():
             print("-recepteur-")
             print("clé sk partagée :", recepteur.sk)
             print("clé Ratchet chainée :", recepteur.cle_ratchet.cle_chainee)
-        if choix == '2':
+        elif choix == '2':
             emetteur.kdf_ratchet()
             recepteur.kdf_ratchet()
+        elif choix == '3':
+            eph_pub_r_bin = recepteur.publication_cle_dh()
+            eph_pub_e_bin = emetteur.calcul_rachet_emetteur_dh(eph_pub_r_bin, p, g)
+            recepteur.calcul_rachet_recepteur_dh(eph_pub_e_bin, p, g)
+        elif choix == '4':
+            print("entrer le message à envoyer :")
+            message = input("")
+            print("-", emetteur.name, "-")
+            message_chiffre = emetteur.envoie_message(message)
+            print("message chiffré :", message_chiffre)
+            message_dechiffre = recepteur.reception_message(message_chiffre)
+            print("-", recepteur.name, "-")
+            print("message déchiffré :", message_dechiffre)
 
 
 if __name__ == '__main__':

@@ -1,9 +1,8 @@
 from GS15.Classes.Fonctions import exponentiation_rapide
 
-TAILLE_CLE = 2048
-
-
 class Cle_Ratchet:
+
+    MAX_BYTES: int = 2048
 
     def __init__(self, cle_chainee):
         self._cle_chainee = cle_chainee
@@ -16,11 +15,11 @@ class Cle_Ratchet:
         cle_message(n + 1) = cle_chainee(n) * cle_chainee(n + 1)
 
         """
-        print(self._cle_chainee)
-        cle_chainee_suivante = self._cle_chainee * self._cle_chainee % pow(2, TAILLE_CLE)
+        # print(self._cle_chainee)
+        cle_chainee_suivante = self._cle_chainee * self._cle_chainee % pow(2, self.MAX_BYTES)
 
-        self._cle_message = cle_chainee_suivante * self._cle_chainee % pow(2, TAILLE_CLE)
-        print(self._cle_message)
+        self._cle_message = cle_chainee_suivante * self._cle_chainee % pow(2, self.MAX_BYTES)
+        # print(self._cle_message)
         self._cle_chainee = cle_chainee_suivante
 
     @property
