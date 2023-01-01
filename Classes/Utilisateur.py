@@ -1,22 +1,20 @@
-from Cle import Cle
-from Cle_Rachet import Cle_Rachet
-import Fonctions
+from . import Fonctions
+from .Cle_Ratchet import Cle_Ratchet
 import random
+from .Cle import Cle
 
 
 class Utilisateur:
-    # TODO : créer une paire de clé Rachet
-
     sk: int
-    cle_rachet : Cle_Rachet
+    cle_ratchet: Cle_Ratchet
 
-
-    def __init__(self, p, g, nb_cle_otk):
+    def __init__(self, p, g, nb_cle_otk, name):
         self.id = Cle(p, g)  # Clé preuve pour une utilisation long terme
         self.pk = Cle(p, g)  # pré-clé signée
         self.otpk = []
         self.nb_cle_otpk = nb_cle_otk
-        self.eph = Cle(p, g) # Clé éphémère
+        self.eph = Cle(p, g)  # Clé éphémère
+        self.name = name
         # self.pk.signature() TODO ecrire la fonction de signature
         for i in range(nb_cle_otk):
             self.otpk.append(Cle(p, g))
@@ -31,20 +29,18 @@ class Utilisateur:
         Calcul de la clé partagée SK pour Bob
         """
         # TODO : vérification de la signature ajouter sig_pk_a: int auix paramètres
-
-
+        self.eph = Cle(p, g)
 
         dh1: int = Fonctions.exponentiation_rapide(pk_a, self.id.id_priv, p)
         dh2: int = Fonctions.exponentiation_rapide(id_a, self.eph.id_priv, p)
         dh3: int = Fonctions.exponentiation_rapide(pk_a, self.eph.id_priv, p)
         dh4: int = Fonctions.exponentiation_rapide(otpk_a, self.eph.id_priv, p)
 
-        self.sk = dh1 | dh2 | dh3 | dh4  # TODO définir la fonction de calcul
+        self.sk = (dh1 + dh2 + dh3 + dh4) % p  # TODO définir la fonction de calcul
 
-        self.eph = Cle(p, g)
-        self.cle_rachet = Cle_Rachet(self.sk)
+        self.cle_ratchet = Cle_Ratchet(self.sk)
 
-        return self.id.id_pub, eph.id_pub, i
+        return self.id.id_pub, self.eph.id_pub, i
 
     def calcul_sk_destinataire_x3dh(self, id_pub_b, eph_pub_b, i: int, p: int):
         otpk: Cle = self.otpk[i]
@@ -53,26 +49,27 @@ class Utilisateur:
         dh3: int = Fonctions.exponentiation_rapide(eph_pub_b, self.pk.id_priv, p)
         dh4: int = Fonctions.exponentiation_rapide(eph_pub_b, otpk.id_priv, p)
 
-        self.cle_rachet = Cle_Rachet(self.sk)
+        self.sk = (dh1 + dh2 + dh3 + dh4) % p # TODO définir la fonction de calcul
 
-        self.sk = dh1 | dh2 | dh3 | dh4  # TODO définir la fonction de calcul
+        self.cle_ratchet = Cle_Ratchet(self.sk)
 
     def publication_cle_dh(self):
         return self.eph.id_pub()
 
-    def calcul_rachet_emetteur_dh(self, eph_pub_r:int, p: int, g: int) -> int:
-
-        self.cle_rachet = Cle_Rachet(Fonctions.exponentiation_rapide(eph_pub_r, self.eph.id_priv, p))
+    def calcul_rachet_emetteur_dh(self, eph_pub_r: int, p: int, g: int) -> int:
+        self.cle_ratchet = Cle_Ratchet(Fonctions.exponentiation_rapide(eph_pub_r, self.eph.id_priv, p))
 
         eph_pub_e = self.eph.id_pub()
         self.eph = Cle(p, g)
 
         return eph_pub_e
 
-    def calcul_rachet_recepteur_dh(self, eph_pub_e:int, p: int, g: int):
-
-        self.cle_rachet = Cle_Rachet(Fonctions.exponentiation_rapide(eph_pub_e, self.eph.id_priv, p))
+    def calcul_rachet_recepteur_dh(self, eph_pub_e: int, p: int, g: int):
+        self.cle_ratchet = Cle_Ratchet(Fonctions.exponentiation_rapide(eph_pub_e, self.eph.id_priv, p))
         self.eph = Cle(p, g)
+
+    def kdf_ratchet(self):
+        self.cle_ratchet.fonction_derivation()
 
 
 '''

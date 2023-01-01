@@ -7,13 +7,45 @@ g: int = 16494993765130372726046668877483462242074423706025445459806497394609601
 def main():
     nb_cle_otk = 10
 
-    alice = Utilisateur(p, g, nb_cle_otk)
-    bob = Utilisateur(p, g, nb_cle_otk)
+    alice = Utilisateur(p, g, nb_cle_otk, "Alice")
+    bob = Utilisateur(p, g, nb_cle_otk, "Bob")
 
-    id_pub_a, pk_pub_a, optk_pub_a, optk_i = alice.publication_cle()
+    emetteur: Utilisateur = None
+    while emetteur is None:
+        choix = input("Qui êtes vous ? 1 : Alice, 2 : Bob")
+        if choix == '1':
+            emetteur = alice
+            recepteur = bob
+        if choix == '2':
+            emetteur = bob
+            recepteur = alice
+        print(choix)
 
-    id_pub_b, id_eph, optk_i = bob.calcul_sk_emetteur_x3dh(id_pub_a, pk_pub_a, optk_pub_a, optk_i, p, g)
-    alice.calcul_sk_destinataire_x3dh(id_pub_b, id_eph, optk_i, p)
+    # Echange initial de clé entre emetteur et recepteur via X3DH
+
+    id_pub_a, pk_pub_a, optk_pub_a, optk_i = recepteur.publication_cle()
+    id_pub_b, id_eph, optk_i = emetteur.calcul_sk_emetteur_x3dh(id_pub_a, pk_pub_a, optk_pub_a, optk_i, p, g)
+    recepteur.calcul_sk_destinataire_x3dh(id_pub_b, id_eph, optk_i, p)
+
+    while True:
+        print("--------------------------")
+        print("Que souhaitez vous faire ?")
+        print("1 : comparer la valeur des clés")
+        print("2 : incrémenter les clés Rachet")
+        print("3 : nouvelles clés via dh")
+        choix = input("commande :")
+
+        if choix == '1':
+            print("-emetteur-")
+            print("clé sk partagée :", emetteur.sk)
+            print("clé Ratchet chainée :", emetteur.cle_ratchet.cle_chainee)
+            print("")
+            print("-recepteur-")
+            print("clé sk partagée :", recepteur.sk)
+            print("clé Ratchet chainée :", recepteur.cle_ratchet.cle_chainee)
+        if choix == '2':
+            emetteur.kdf_ratchet()
+            recepteur.kdf_ratchet()
 
 
 if __name__ == '__main__':

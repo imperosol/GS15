@@ -9,7 +9,7 @@ PISTE AMELIORATION : Hasher la clé pour qu'elle soit plus petite
 NBR_TOURNE_FEISTEL: int = 32
 
 
-def bourrage_zero(nbr_bin: str, taille: int) -> int:
+def bourrage_zero(nbr_bin: str, taille: int) -> str:
     bourrage: str = ""
     for i in range(len(nbr_bin), taille):
         bourrage = bourrage + "0"

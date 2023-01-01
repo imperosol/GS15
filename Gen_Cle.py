@@ -1,4 +1,4 @@
-import Fonctions
+from GS15.Classes import Fonctions
 
 if __name__ == '__main__':
     p, p_facteur = Fonctions.gen_nbr_premier_produit(17)

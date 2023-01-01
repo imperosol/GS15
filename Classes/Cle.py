@@ -1,5 +1,5 @@
 import random
-from .. Fonctions import exponentiation_rapide
+from GS15.Classes.Fonctions import exponentiation_rapide
 
 
 class Cle:

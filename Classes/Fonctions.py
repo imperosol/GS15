@@ -16,10 +16,10 @@ def exponentiation_rapide(a: int, e: int, p: int) -> int:
     for i in p_bin[1:]:  # converti le nombre e en binaire et l'inverse
         j += 1
         a_pow = a_pow * a_pow % p
-        #print(a, "puissance", j, "=", a_pow)
+        # print(a, "puissance", j, "=", a_pow)
         if i == '1':
             resultat = (resultat * a_pow) % p
-            #print("resultat =", resultat)
+            # print("resultat =", resultat)
     return resultat
 
 def rabbin_miller(p: int, a: int) -> bool:
