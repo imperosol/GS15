@@ -1,18 +1,13 @@
 from .Fonctions import bourrage_zero
-'''
-Pour la génération de sous-clé de Feistel, on divise la clé d'entrée en N sous-clés.
-La taille de la sous-clé correspond à la taille du bloc à chiffrer
 
-PISTE AMELIORATION : Hasher la clé pour qu'elle soit plus petite
-'''
 NBR_TOURNE_FEISTEL: int = 32
 
 
 def fonction_feistel(d: int, cle: int, taille_cle) -> int:
-    '''
+    """
     applique la fonction de Festel
     F(d, cle) = d + cle mod taille_cle
-    '''
+    """
 
     resultat = (d + cle) % pow(2, taille_cle)
     return resultat
@@ -21,7 +16,7 @@ def fonction_feistel(d: int, cle: int, taille_cle) -> int:
 def decalage_cle_feistel(cle: int, taille_cle: int) -> int:
     """
     Calcul la clé n+1 à partir de la clé n
-    clé(n+1) = ddéclage de 2 bits vers la gauche de clé(n)
+    clé(n+1) = déclage de 2 bits vers la gauche de clé(n)
     """
 
     cle_bin = format(cle, "b")
@@ -70,12 +65,12 @@ def feistel_preparation_dg(nbr: int, taille_cle: int) -> (int, int):
     # Fait en sorte que nbr_bin ait la longueur de taille_cle * 2
     nbr_bin = bourrage_zero(format(nbr, "b"), taille_cle * 2)
 
-    d = int(nbr_bin[:(taille_cle)], 2)
+    d = int(nbr_bin[:taille_cle], 2)
 
     if len(nbr_bin) <= taille_cle:
         g = 0
     else:
-        g = int(nbr_bin[(taille_cle):], 2)
+        g = int(nbr_bin[taille_cle:], 2)
 
     return d, g
 
@@ -157,8 +152,8 @@ def chiffrement_bloc(message: str, cle: int, taille_cle: int) -> str:
 
 def dechiffrement_bloc(message: str, cle: int, taille_cle: int) -> str:
     '''
-    Divise le message binaire en N sous blocs de 2048 bits
-    CHiffre chacun de ces blocs à l'aide d'un schéma à 32 tournées de Feistel
+    Divise le message binaire en nbr_division sous blocs de 2048 bits
+    CHiffre chacun de ces blocs à l'aide d'un schéma à NBR_TOURNE_FEISTEL tournées de Feistel
     '''
 
     # Divise un message en nbr_division bloc de taille taille_cle*2
