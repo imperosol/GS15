@@ -1,5 +1,5 @@
 from Fonctions.Utilisateur import Utilisateur
-from GS15.Fonctions import Fonctions
+from Fonctions import Fonctions
 
 
 def main():
